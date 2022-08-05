@@ -1,0 +1,22 @@
+[package]
+name = "wrap-link-wrapper"
+version = "0.1.0"
+description = "A Polywrap Wasm wrapper for the Polywrap wrap link standard"
+authors = ["Polywrap"]
+repository = "https://github.com/nerfZael/wrap-link-wrapper"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+polywrap-wasm-rs = { version = "0.1.0" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.82"
+eyre = "0.6.8"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 's'
+lto = true
+panic = 'abort'

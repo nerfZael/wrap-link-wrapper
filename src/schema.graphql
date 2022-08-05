@@ -1,0 +1,26 @@
+#import { Module, InvocationResult } into WrapClient from "wrap://ens/wrap-client.eth"
+
+type Module {
+    get(path: String!, args: Bytes): Response
+}
+
+type Response {
+    headers: [Header!]
+    data: Bytes
+}
+
+type Header {
+    name: String!
+    value: String!
+}
+
+type WrapLinkJson {
+    _wrap_link_type: String!
+    content: String!
+}
+
+type WrapLinkFile {
+    _wrap_link_type: String!
+    content: Bytes!
+    contentType: String!
+}
