@@ -1,6 +1,6 @@
 {
   "name": "wrap-link-wrapper",
-  "description": "Wrapper for the wrap-link standard",
+  "description": "Wrapper for the wrap link standard",
   "private": true,
   "version": "0.1.0",
   "scripts": {

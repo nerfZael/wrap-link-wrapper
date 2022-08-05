@@ -1,7 +1,7 @@
 [package]
 name = "wrap-link-wrapper"
 version = "0.1.0"
-description = "A Polywrap Wasm wrapper for the Polywrap wrap link standard"
+description = "Wrapper for the wrap link standard"
 authors = ["Polywrap"]
 repository = "https://github.com/nerfZael/wrap-link-wrapper"
 license = "MIT"
