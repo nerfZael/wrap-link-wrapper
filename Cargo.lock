@@ -193,7 +193,7 @@ checksum = "c4f5b37a154999a8f3f98cc23a628d850e154479cd94decf3414696e12e31aaf"
 
 [[package]]
 name = "wrap-link-wrapper"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "eyre",
  "polywrap-wasm-rs",
