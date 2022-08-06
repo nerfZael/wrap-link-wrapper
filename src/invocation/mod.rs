@@ -1,11 +1,11 @@
 use eyre::Result;
 use polywrap_wasm_rs::{Context, ReadDecoder, Read};
-use crate::wrap::Header;
-use crate::wrap::response::Response;
+use crate::wrap::wrap_link_header::WrapLinkHeader;
 use crate::wrap::wrap_link_json::deserialize_wrap_link_json;
 use crate::wrap::wrap_link_file::deserialize_wrap_link_file;
+use crate::wrap::wrap_link_response::{WrapLinkResponse, deserialize_wrap_link_response};
 
-pub fn convert_invocation_result_to_response(result: Option<Vec<u8>>) -> Option<Response> {
+pub fn convert_invocation_result_to_response(result: Option<Vec<u8>>) -> Option<WrapLinkResponse> {
   if result == None {
       return None;
   }
@@ -15,18 +15,18 @@ pub fn convert_invocation_result_to_response(result: Option<Vec<u8>>) -> Option<
   match read_wrap_link_result(result) {
       Ok(result) => match result {
           WrapLinkResult::String(result) => {
-              return Some(Response {
+              return Some(WrapLinkResponse {
                   data: Some(result.into_bytes()),
-                  headers: Some(vec![Header {
+                  headers: Some(vec![WrapLinkHeader {
                       name: "Content-Type".to_string(),
                       value: "text/html".to_string()
                   }])
               });
           },
           WrapLinkResult::Msgpack(result) => {
-            return Some(Response {
+            return Some(WrapLinkResponse {
                 data: Some(result),
-                headers: Some(vec![Header {
+                headers: Some(vec![WrapLinkHeader {
                     name: "Content-Type".to_string(),
                     value: "msgpack".to_string()
                 }])
@@ -36,9 +36,9 @@ pub fn convert_invocation_result_to_response(result: Option<Vec<u8>>) -> Option<
               _wrap_link_type,
               content,
           } => {
-              return Some(Response {
+              return Some(WrapLinkResponse {
                   data: Some(content.into_bytes()),
-                  headers: Some(vec![Header {
+                  headers: Some(vec![WrapLinkHeader {
                       name: "Content-Type".to_string(),
                       value: "application/json".to_string()
                   }])
@@ -49,12 +49,21 @@ pub fn convert_invocation_result_to_response(result: Option<Vec<u8>>) -> Option<
               content,
               content_type
           } => {
-              return Some(Response {
+              return Some(WrapLinkResponse {
                   data: Some(content),
-                  headers: Some(vec![Header {
+                  headers: Some(vec![WrapLinkHeader {
                       name: "Content-Type".to_string(),
                       value: content_type.to_string()
                   }])
+              });
+          },
+          WrapLinkResult::WrapLinkResponse {
+              data,
+              headers,
+          } => {
+              return Some(WrapLinkResponse {
+                  data: data,
+                  headers: headers
               });
           }
       },
@@ -73,6 +82,10 @@ enum WrapLinkResult {
       _wrap_link_type: String,
       content: Vec<u8>,
       content_type: String,
+  },
+  WrapLinkResponse {
+    headers: Option<Vec<WrapLinkHeader>>,
+    data: Option<Vec<u8>>,
   }
 }
 
@@ -101,6 +114,13 @@ fn read_wrap_link_result(result: Vec<u8>) -> Result<WrapLinkResult> {
           content_type: result.content_type,
       });
   }
+
+  if let Ok(result) = deserialize_wrap_link_response(&result) {
+    return Ok(WrapLinkResult::WrapLinkResponse {
+        headers: result.headers,
+        data: result.data,
+    });
+}
 
   Ok(
     WrapLinkResult::Msgpack(result)

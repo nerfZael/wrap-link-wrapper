@@ -22,7 +22,7 @@ pub fn write_string<W: Write>(str: String, writer: &mut W) -> Result<(), EncodeE
     Ok(())
 }
 
-pub fn get(args: ArgsGet) -> Option<Response> {
+pub fn get(args: ArgsGet) -> Option<WrapLinkResponse> {
     let result = get_command_with_path_parts(&args);
 
     if result.is_none() {
@@ -34,9 +34,9 @@ pub fn get(args: ArgsGet) -> Option<Response> {
     match command.as_str() {
         "i" => convert_invocation_result_to_response(execute_invoke(path_parts, args.args)),
         "schema" => match get_schema(path_parts) {
-            Some(schema) => Some(Response {
+            Some(schema) => Some(WrapLinkResponse {
                 data: Some(format!("<pre>{}<pre>", schema).into_bytes()),
-                headers: Some(vec![Header {
+                headers: Some(vec![WrapLinkHeader {
                     name: "Content-Type".to_string(),
                     value: "text/html".to_string()
                 }])
@@ -44,9 +44,9 @@ pub fn get(args: ArgsGet) -> Option<Response> {
             None => None,
         },
         "manifest" => match get_manifest(path_parts) {
-            Some(manifest) => Some(Response {
+            Some(manifest) => Some(WrapLinkResponse {
                 data: Some(format!("<pre>{}<pre>", serde_json::to_string_pretty(&manifest).unwrap()).into_bytes()),
-                headers: Some(vec![Header {
+                headers: Some(vec![WrapLinkHeader {
                     name: "Content-Type".to_string(),
                     value: "text/html".to_string()
                 }])
